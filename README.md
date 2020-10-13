@@ -27,6 +27,10 @@ pip install esprima
 >>**Notice:  
 >>The value of "uploadFileStr" need to be captured from Fiddler or Charles when you submit the information manually**  
 >>  
+>>line 178:  ``` api = "https://sc.ftqq.com/[].send"  # Apply an server-chan api on ftqq.com and fill the expression```  
+>>**Notice:  
+>>You will need to apply for a Server-Chan API from http://sc.ftqq.com**  
+>>  
 >iMessage.py:
 >>line 9:  ```"from": "example@example.com",``` **e.g. username(send_from)@163.com**  
 >>line 10:  ```"to": "example@example.com",``` **e.g. username(send_to)@gmail.com**  
