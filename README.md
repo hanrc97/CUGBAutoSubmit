@@ -37,6 +37,6 @@ pip install esprima
 ### Run
 WINDOWS:  ```python main.py```
 
-Linux:  ```python3 main.py``` or ***(Recommend)*** set a crontab  ```1 16 * * * python3 /.../.../FucknCoVReport/main.py```
+Linux:  ```python3 main.py``` or ***(Recommend)*** set a crontab  ```1 16 * * * python3 /usr/local/src/CUGBAutoSubmit/main.py```
 ## STATEMENT
 Some core code is from the author cmzz on CSDN (url: https://blog.csdn.net/qq_40965177/article/details/105986587)
