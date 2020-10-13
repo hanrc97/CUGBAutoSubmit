@@ -43,7 +43,7 @@ class PCPost:
 
             # CAS Unified Auth:
             url = 'https://cas.cugb.edu.cn/login'
-            req = self.session.request('GET', url).content
+            req = self.session.request('GET', url, verify=False).content
             soup = BeautifulSoup(req, 'html.parser')
             execution = soup.findAll("input", {"name": "execution"})[0]["value"]
             system = soup.findAll("input", {"id": "userLoginSystem"})[0]["value"]
@@ -63,14 +63,15 @@ class PCPost:
             time.sleep(3)
             # To get the uid from javascript:
             uidurl = 'https://stu.cugb.edu.cn/'
-            req = self.session.request('GET', uidurl, cookies=self.cookies, headers=self.headers).content
+            req = self.session.request('GET', uidurl, cookies=self.cookies, headers=self.headers, verify=False).content
             soup = BeautifulSoup(req, 'html.parser')
             scriptTags = str(soup.findAll('script')[1])
             rexp = re.compile(r'<[^>]+>', re.S)
             scriptCode = rexp.sub('', scriptTags)
             uid = esprima.tokenize(scriptCode)[48].value.replace('\'', '')
             uiddata = {'uid': uid}
-            req = self.session.request('POST', "https://stu.cugb.edu.cn:443/caswisedu/login.htm", data=uiddata)
+            req = self.session.request('POST', "https://stu.cugb.edu.cn:443/caswisedu/login.htm", data=uiddata,
+                                       verify=False)
             time.sleep(3)
             content = self.session.post(
                 'https://stu.cugb.edu.cn/webApp/xuegong/index.html#/zizhu/apply?projectId=4a4ce9d674438da101745ca20e2b3a5e&type=YQSJCJ')
@@ -110,60 +111,67 @@ class PCPost:
     def out_apply(self):
         # cookie_para = {i.split("=")[0]: i.split("=")[1] for i in cookie.split("; ")}
         (reas, date, addr) = self.random_reason()
-        datastr = '''{"xmqkb":{"id":"4a4ce9d674438da101745ca20e2b3a5e"},"c1":"18268866407","c2":"临时出校","c17":"学19楼","c18":"1103","c7":\"%s\","c8":\"%s\","c13":\"%s\","c15":"是","type":"YQSJCJ"}'''
         # ★Modification needed
+        # "c1":"182XXXX1234"---Your telephone number
+        # "c7":"学19楼"     ---Your building number
+        # "c18":"110X"      ---Your room number
+        # 'uploadFileStr': '''{"c16":[]}'''   ---need to be captured from Fiddler or Charles
+        datastr = '''{"xmqkb":{"id":"4a4ce9d674438da101745ca20e2b3a5e"},"location_address":"北京市海淀区学院路街道中国地质大学(北京)","location_longitude":"116.35207","location_latitude":"39.953298","c1":"182XXXX1234","c2":"临时出校","c17":"学19楼","c18":"110X","c7":\"%s\","c8":\"%s\","c13":\"%s\","c15":"是","type":"YQSJCJ"}'''
         data = {
             'data': datastr % (reas, date, addr),
             'msgUrl': '''syt/zzapply/list.htm?type=YQSJCJ&xmid=4a4ce9d674438da101745ca20e2b3a5e''',
             'uploadFileStr': '''{"c16":[]}''',
             'multiSelectData': '''{}'''}
-        # In the dict above, 'uploadFileStr' need to be captured from Fiddler or Charles
-        try:
-            r = self.session.request('POST', url='https://stu.cugb.edu.cn:443/syt/zzapply/operation.htm',
-                                     headers=self.headers, cookies=self.cookies, data=data)
-            # print(r.status_code)
-            if r.text == 'success':
-                self.message2 = 'Succeeded'
-                self.message3 = reas + "\n" + date + "\n" + addr
-                self.subj = '☛已提交，等待系统自动通过...'
-                self.content = """
-                【提交信息☟】
-                日期：%s
-                事由：%s
-                地址：%s
-                """ % (date, reas, addr)
-            elif r.text == 'Applied today':
-                self.message2 = 'Applied today'
-                self.message3 = reas + "\n" + date + "\n" + addr
-                self.subj = '☛今日已提交！'
-                self.content = """
-                【提交信息☟】
-                日期：%s
-                事由：%s
-                地址：%s
-                """ % (date, reas, addr)
-            else:
-                self.message2 = 'Failed. Please check it'
+        while True:
+            try:
+                r = self.session.request('POST', url='https://stu.cugb.edu.cn:443/syt/zzapply/operation.htm',
+                                         headers=self.headers, cookies=self.cookies, data=data)
+                print(r.status_code)
+                if r.text == 'success':
+                    self.message2 = 'Succeeded'
+                    self.message3 = reas + "\n" + date + "\n" + addr
+                    self.subj = '☛已提交，等待系统自动通过...'
+                    self.content = """
+                    【提交信息☟】
+                    日期：%s
+                    事由：%s
+                    地址：%s
+                    """ % (date, reas, addr)
+                elif r.text == 'Applied today':
+                    self.message2 = 'Applied today'
+                    self.message3 = reas + "\n" + date + "\n" + addr
+                    self.subj = '☛今日已提交！'
+                    self.content = """
+                    【提交信息☟】
+                    日期：%s
+                    事由：%s
+                    地址：%s
+                    """ % (date, reas, addr)
+                else:
+                    self.message2 = 'Failed. Please check it'
+                    self.message3 = reas + "\n" + date + "\n" + addr
+                    self.subj = '☛出现异常，请查看日志！'
+                    self.content = """
+                    【提交信息☟】
+                    日期：%s
+                    事由：%s
+                    地址：%s
+                    """ % (date, reas, addr)
+            except Exception as e:
+                self.message2 = 'Error Code 1: ' + str(e)
                 self.message3 = reas + "\n" + date + "\n" + addr
                 self.subj = '☛出现异常，请查看日志！'
                 self.content = """
+                【⚠警告！抛出异常代码！⚠】
+                %s
                 【提交信息☟】
                 日期：%s
                 事由：%s
                 地址：%s
-                """ % (date, reas, addr)
-        except Exception as e:
-            self.message2 = 'Error Code 1: ' + str(e)
-            self.message3 = reas + "\n" + date + "\n" + addr
-            self.subj = '出现异常，请查看日志！'
-            self.content = """
-            【⚠警告！抛出异常代码】
-            %s
-            【提交信息☟】
-            日期：%s
-            事由：%s
-            地址：%s
-            """ % (self.message2, date, reas, addr)
+                """ % (self.message2, date, reas, addr)
+                time.sleep(3)
+            else:
+                break
 
     def send_to_wechat(self):
         # ★Modification needed
@@ -173,8 +181,45 @@ class PCPost:
             "desp": self.content}
         requests.post(api, data=data)
 
-    # def check_status(self):
-    #     time.sleep(30)
+    def check_status(self):
+        while True:
+            try:
+                data = {'pageIndex': '0', 'pageSize': '10', 'xmid': '4a4ce9d674438da101745ca20e2b3a5e',
+                        'type': 'YQSJCJ'}
+                r = self.session.request('POST', url='https://stu.cugb.edu.cn/syt/zzapply/queryxssqlist.htm',
+                                         headers=self.headers, cookies=self.cookies, data=data)
+                applyid = re.findall(re.compile(r'\"id\":\"(.*?)\"'), r.text)[0]
+                data = {'id': applyid}
+                r = self.session.request('POST',
+                                         url='https://stu.cugb.edu.cn:443/syt/zzapi/getApproveStatusByApplyId.htm',
+                                         headers=self.headers, cookies=self.cookies, data=data)
+                status = re.findall(re.compile(r'\"data\":\"(.*?)\"'), r.text)[0]
+                if status == 'xz':
+                    self.subj = '✔已通过'
+                    self.content = """
+                    【😃早上好，Francis！】
+                    ◉出校请注意安全~(￣▽￣)~*
+                    ◉抓紧写论文✍⌨
+                    ◉做事不要拖✈💪
+                    """
+                elif status == 'wh':
+                    self.subj = '⏰等待中...'
+                    self.content = """
+                    【⏰每2分钟查询，请等待...】
+                    ◉当前状态：%s
+                    """ % r.text
+                else:
+                    self.subj = '☛出现异常，请查看日志！'
+                    self.content = """
+                    【⚠出现异常，请查看日志！】
+                    """
+            except Exception as e:
+                self.message1 = 'Error Code 2: ' + str(e)
+                print(self.message1)
+                time.sleep(600)  # if exceptions happened, wait for 5 minutes
+            else:
+                break  # if no exceptions happened, break the while loop
+        return status
 
 
 if __name__ == '__main__':
@@ -183,3 +228,9 @@ if __name__ == '__main__':
     iMessage.send_Message(News=student.message1 + "\n" + "Out-Apply: " + student.message3,
                           sub="Application: " + student.message2)
     student.send_to_wechat()
+    while True:  # while True loop
+        time.sleep(120)  # wait for 2 minutes
+        status = student.check_status()
+        if status == 'xz':  # if the status match with the string 'xz', send the status and break the while loop
+            student.send_to_wechat()
+            break
