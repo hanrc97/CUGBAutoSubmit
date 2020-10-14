@@ -5,7 +5,7 @@ An automatic script for CUGB's JailBreak application
 ## UPDATES
 ### **2020/10/13 - This update version resolved:**  
 - A new feature for the site that uses https and CAS Auth.  
-- Now you can get the status of application after about 5 minutes.  
+- Now you can get the status of application after about 4 minutes (check the status per 2 minutes).  
 ## REQUIREMENTS
 pip install requests  
 pip install bs4  
