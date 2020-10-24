@@ -42,5 +42,10 @@ pip install esprima
 WINDOWS:  ```python main.py```
 
 Linux:  ```python3 main.py``` or ***(Recommend)*** set a crontab  ```1 16 * * * python3 /usr/local/src/CUGBAutoSubmit/main.py```
+### Effects
+![image](https://github.com/hanrc97/CUGBAutoSubmit/blob/master/imgs/effect1.jpg)  
+![image](https://github.com/hanrc97/CUGBAutoSubmit/blob/master/imgs/effect2.jpg)  
+![image](https://github.com/hanrc97/CUGBAutoSubmit/blob/master/imgs/effect3.jpg)  
+![image](https://github.com/hanrc97/CUGBAutoSubmit/blob/master/imgs/effect4.jpg)  
 ## STATEMENT
 Some core code is from the author cmzz on CSDN (url: https://blog.csdn.net/qq_40965177/article/details/105986587)
