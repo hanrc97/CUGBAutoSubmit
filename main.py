@@ -58,7 +58,7 @@ class PCPost:
                     'loginType': 'username',
                     'system': system,  # '27A5A4DF0C874122A0AFE0367F0A3F46'
                     'enableCaptcha': 'N'}
-            req = self.session.post(url=url, data=data, headers=self.headers)
+            req = self.session.post(url=url, data=data, headers=self.headers, verify=False)
             self.cookies = requests.utils.dict_from_cookiejar(req.cookies)
             time.sleep(3)
             # To get the uid from javascript:
@@ -74,7 +74,7 @@ class PCPost:
                                        verify=False)
             time.sleep(3)
             content = self.session.post(
-                'https://stu.cugb.edu.cn/webApp/xuegong/index.html#/zizhu/apply?projectId=4a4ce9d674438da101745ca20e2b3a5e&type=YQSJCJ')
+                'https://stu.cugb.edu.cn/webApp/xuegong/index.html#/zizhu/apply?projectId=4a4ce9d674438da101745ca20e2b3a5e&type=YQSJCJ', verify=False)
             if content.status_code == 200:
                 self.message1 = "Login status: Succeeded"
                 time.sleep(3)
@@ -125,7 +125,7 @@ class PCPost:
         while True:
             try:
                 r = self.session.request('POST', url='https://stu.cugb.edu.cn:443/syt/zzapply/operation.htm',
-                                         headers=self.headers, cookies=self.cookies, data=data)
+                                         headers=self.headers, cookies=self.cookies, data=data, verify=False)
                 print(r.status_code)
                 if r.text == 'success':
                     self.message2 = 'Succeeded'
@@ -179,7 +179,7 @@ class PCPost:
         data = {
             "text": self.subj,
             "desp": self.content}
-        requests.post(api, data=data)
+        requests.post(api, data=data, verify=False)
 
     def check_status(self):
         while True:
@@ -187,12 +187,12 @@ class PCPost:
                 data = {'pageIndex': '0', 'pageSize': '10', 'xmid': '4a4ce9d674438da101745ca20e2b3a5e',
                         'type': 'YQSJCJ'}
                 r = self.session.request('POST', url='https://stu.cugb.edu.cn/syt/zzapply/queryxssqlist.htm',
-                                         headers=self.headers, cookies=self.cookies, data=data)
+                                         headers=self.headers, cookies=self.cookies, data=data, verify=False)
                 applyid = re.findall(re.compile(r'\"id\":\"(.*?)\"'), r.text)[0]
                 data = {'id': applyid}
                 r = self.session.request('POST',
                                          url='https://stu.cugb.edu.cn:443/syt/zzapi/getApproveStatusByApplyId.htm',
-                                         headers=self.headers, cookies=self.cookies, data=data)
+                                         headers=self.headers, cookies=self.cookies, data=data, verify=False)
                 status = re.findall(re.compile(r'\"data\":\"(.*?)\"'), r.text)[0]
                 if status == 'xz':
                     self.subj = '✔已通过'
