@@ -48,7 +48,5 @@ Linux:  ```python3 main.py``` or ***(Recommend)*** set a crontab  ```1 16 * * * 
 <img src="https://github.com/hanrc97/CUGBAutoSubmit/blob/master/imgs/effect3.jpg" width="375" alt="效果3"/>  
 <img src="https://github.com/hanrc97/CUGBAutoSubmit/blob/master/imgs/effect4.jpg" width="375" alt="效果4"/>  
 
-<video src="https://github.com/hanrc97/CUGBAutoSubmit/blob/master/vids/test.mp4" controls="controls" width="500" height="300">您的浏览器不支持播放该视频！</video>  
-
 ## STATEMENT
 Some core code is from the author cmzz on CSDN (url: https://blog.csdn.net/qq_40965177/article/details/105986587)
