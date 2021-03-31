@@ -3,7 +3,7 @@ import requests
 from bs4 import BeautifulSoup
 from http import cookiejar
 import time
-import iMessage
+#import iMessage
 import datetime
 import random
 import esprima
@@ -15,7 +15,7 @@ class PCPost:
         self.cookies = {}
         # mock the build-in browser of WeChat:
         self.headers = {
-            'User-Agent': 'Mozilla/5.0 (Linux; Android 10; PCT-AL10 Build/HUAWEIPCT-AL10; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/78.0.3904.62 XWEB/2575 MMWEBSDK/200701 Mobile Safari/537.36 MMWEBID/4039 MicroMessenger/7.0.17.1720(0x27001137) Process/tools WeChat/arm64 NetType/WIFI Language/en ABI/arm64',
+            'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 MicroMessenger/8.0.2(0x18000237) NetType/4G Language/en',
             'Referer': 'https://stu.cugb.edu.cn/webApp/xuegong/index.html',
             'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}
         self.session = requests.session()
@@ -88,21 +88,80 @@ class PCPost:
         Y = datetime.datetime.now().year
         M = datetime.datetime.now().month
         D = datetime.datetime.now().day + 1
+        date = ''
         if D < 10:
-            date = str(Y) + "-" + str(M) + "-" + "0" + str(D)
-        else:
-            date = str(Y) + "-" + str(M) + "-" + str(D)
-        reas_addr = {"买日用品": "民族园路2号",
-                     "买水果": "学清路27号",
-                     "牙医预约": "花园北路49号",
+            if M in [10, 11, 12]:
+                date = str(Y) + "-" + str(M) + "-" + "0" + str(D)
+            else:
+                date = str(Y) + "-" + "0" + str(M) + "-" + "0" + str(D)
+        elif D <= 32:
+            if M == 2:
+                if (Y % 4 == 0 and Y % 100 != 0) or Y % 400 == 0:
+                    if D == 30:
+                        M = M + 1
+                        D = 1
+                        date = str(Y) + "-" + "0" + str(M) + "-" + "0" + str(D)
+                    else:
+                        date = str(Y) + "-" + "0" + str(M) + "-" + str(D)
+                else:
+                    if D == 29:
+                        M = M + 1
+                        D = 1
+                        date = str(Y) + "-" + "0" + str(M) + "-" + "0" + str(D)
+                    else:
+                        date = str(Y) + "-" + "0" + str(M) + "-" + str(D)
+            elif M in [1, 3, 5, 7, 8]:
+                if D == 32:
+                    M = M + 1
+                    D = 1
+                    date = str(Y) + "-" + "0" + str(M) + "-" + "0" + str(D)
+                else:
+                    date = str(Y) + "-" + "0" + str(M) + "-" + str(D)
+            elif M == 10:
+                if D == 32:
+                    M = M + 1
+                    D = 1
+                    date = str(Y) + "-" + str(M) + "-" + "0" + str(D)
+                else:
+                    date = str(Y) + "-" + str(M) + "-" + str(D)
+            elif M == 12:
+                if D == 32:
+                    Y = Y + 1
+                    M = 1
+                    D = 1
+                    date = str(Y) + "-" + "0" + str(M) + "-" + "0" + str(D)
+                else:
+                    date = str(Y) + "-" + str(M) + "-" + str(D)
+            elif M in [4, 6]:
+                if D == 31:
+                    M = M + 1
+                    D = 1
+                    date = str(Y) + "-" + "0" + str(M) + "-" + "0" + str(D)
+                else:
+                    date = str(Y) + "-" + "0" + str(M) + "-" + str(D)
+            elif M == 9:
+                if D == 31:
+                    M = M + 1
+                    D = 1
+                    date = str(Y) + "-" + str(M) + "-" + "0" + str(D)
+                else:
+                    date = str(Y) + "-" + "0" + str(M) + "-" + str(D)
+            elif M == 11:
+                if D == 31:
+                    M = M + 1
+                    D = 1
+                    date = str(Y) + "-" + str(M) + "-" + "0" + str(D)
+                else:
+                    date = str(Y) + "-" + str(M) + "-" + str(D)
+        reas_addr = {"买日用品": "超市发",
+                     "买水果": "五道口购物中心",
+                     "牙医预约": "花园北路49号北医",
                      "出去吃饭": "中关村北大街127号",
                      "健身锻炼": "中关村东路16号",
                      "买衣服": "三里屯路19号",
-                     "购物": "成府路28号",
-                     "购买东西": "中关村西区善缘街1号",
+                     "购买东西": "五道口购物中心",
                      "雅思培训": "中关村大街19号",
                      "户外锻炼": "科荟路33号",
-                     "呼吸新鲜空气": "科荟路33号",
                      "户外运动": "科荟路33号",
                      "修发理发": "学清路甲8号"}
         reas, addr = random.choice(list(reas_addr.items()))
@@ -112,13 +171,10 @@ class PCPost:
         # cookie_para = {i.split("=")[0]: i.split("=")[1] for i in cookie.split("; ")}
         (reas, date, addr) = self.random_reason()
         # ★Modification needed
-        # "c1":"182XXXX1234"---Your telephone number
-        # "c7":"学19楼"     ---Your building number
-        # "c18":"110X"      ---Your room number
         # 'uploadFileStr': '''{"c16":[]}'''   ---need to be captured from Fiddler or Charles
-        datastr = '''{"xmqkb":{"id":"4a4ce9d674438da101745ca20e2b3a5e"},"location_address":"北京市海淀区学院路街道中国地质大学(北京)","location_longitude":"116.35207","location_latitude":"39.953298","c1":"182XXXX1234","c2":"临时出校","c17":"学19楼","c18":"110X","c7":\"%s\","c8":\"%s\","c13":\"%s\","c15":"是","type":"YQSJCJ"}'''
+        datastr = '''{"xmqkb":{"id":"4a4ce9d674438da101745ca20e2b3a5e"},"c2":"临时出校","c7":\"%s\","c13":\"%s\","c3":\"%s\","c8":\"%s\","type":"YQSJCJ","location_longitude":"116.35207","location_latitude":"39.953298","location_address":"北京市海淀区学院路街道中国地质大学(北京)"}'''
         data = {
-            'data': datastr % (reas, date, addr),
+            'data': datastr % (reas, addr, reas, date),
             'msgUrl': '''syt/zzapply/list.htm?type=YQSJCJ&xmid=4a4ce9d674438da101745ca20e2b3a5e''',
             'uploadFileStr': '''{"c16":[]}''',
             'multiSelectData': '''{}'''}
@@ -225,9 +281,16 @@ class PCPost:
 if __name__ == '__main__':
     student = PCPost()
     student.login()
-    iMessage.send_Message(News=student.message1 + "\n" + "Out-Apply: " + student.message3,
-                          sub="Application: " + student.message2)
+    #iMessage.send_Message(News=student.message1 + "\n" + "Out-Apply: " + student.message3,
+    #                      sub="Application: " + student.message2)
     student.send_to_wechat()
+    # time.sleep(120)  # wait for 2 minutes to check status
+    # status = student.check_status()
+    # while status != 'xz':  # once status doesn't match with "xz", into while loop
+    #     time.sleep(120)
+    #     status = student.check_status()  # wait for 2 minutes
+    #     student.send_to_wechat()  # send status
+    #
     while True:  # while True loop
         time.sleep(120)  # wait for 2 minutes
         status = student.check_status()
