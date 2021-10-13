@@ -1,6 +1,5 @@
 # CUGBAutoSubmit
-An automatic script for CUGB's JailBreak application  
-中国地质大学（北京）备案制出入校自动申请脚本  
+
 ***免责声明（Disclaimer）：使用该脚本而可能引起的法律责任和学校追究等责任由使用者个人承担，与开发者无关。本项目仅供参考学习之用，为了您和他人的健康着想，请如实填报出校信息！***
 ## UPDATES
 ### **2020/10/13 - This update version resolved:**  
