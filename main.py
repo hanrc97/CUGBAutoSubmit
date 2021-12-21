@@ -8,6 +8,7 @@ import datetime
 import random
 import esprima
 import re
+import json
 
 
 class PCPost:
@@ -24,6 +25,10 @@ class PCPost:
         self.message3 = ''
         self.subj = ''
         self.content = ''
+        f = open('/usr/local/src/CUGBAutoSubmit/config.json', 'r', encoding='utf-8')
+        self.tmp = f.read()
+        f.close()
+        self.userconfig = json.loads(self.tmp)
 
     def login(self):
         try:
@@ -47,9 +52,8 @@ class PCPost:
             soup = BeautifulSoup(req, 'html.parser')
             execution = soup.findAll("input", {"name": "execution"})[0]["value"]
             system = soup.findAll("input", {"id": "userLoginSystem"})[0]["value"]
-            # ★Modification needed
-            uname = ''  # Input your Student Number, e.g. 2005190001
-            upwd = ''  # Input your portals' password, e.g. 123456
+            uname = self.userconfig['username']
+            upwd = self.userconfig['password']
             data = {'username': uname,
                     'password': upwd,
                     'execution': execution,
@@ -153,30 +157,18 @@ class PCPost:
                     date = str(Y) + "-" + str(M) + "-" + "0" + str(D)
                 else:
                     date = str(Y) + "-" + str(M) + "-" + str(D)
-        reas_addr = {"买日用品": "超市发",
-                     "买水果": "五道口购物中心",
-                     "牙医预约": "花园北路49号北医",
-                     "出去吃饭": "中关村北大街127号",
-                     "健身锻炼": "中关村东路16号",
-                     "买衣服": "三里屯路19号",
-                     "购买东西": "五道口购物中心",
-                     "雅思培训": "中关村大街19号",
-                     "户外锻炼": "科荟路33号",
-                     "户外运动": "科荟路33号",
-                     "修发理发": "学清路甲8号"}
+        reas_addr = self.userconfig["reas_addr"]
         reas, addr = random.choice(list(reas_addr.items()))
         return (reas, date, addr)
 
     def out_apply(self):
         # cookie_para = {i.split("=")[0]: i.split("=")[1] for i in cookie.split("; ")}
         (reas, date, addr) = self.random_reason()
-        # ★Modification needed
-        # 'uploadFileStr': '''{"c16":[]}'''   ---need to be captured from Fiddler or Charles
-        datastr = '''{"xmqkb":{"id":"4a4ce9d674438da101745ca20e2b3a5e"},"c2":"临时出校","c7":\"%s\","c13":\"%s\","c3":\"%s\","c8":\"%s\","type":"YQSJCJ","location_longitude":"116.35207","location_latitude":"39.953298","location_address":"北京市海淀区学院路街道中国地质大学(北京)"}'''
+        datastr = '''{"xmqkb":{"id":"4a4ce9d674438da101745ca20e2b3a5e"},"c2":"临时出校","c7":\"%s\","c13":\"%s\","c3":\"%s\","c8":\"%s\","type":"YQSJCJ","location_longitude":"116.359231","location_latitude":"39.893642","location_address":"北京市海淀区学院路街道中国地质大学(北京)"}'''
         data = {
-            'data': datastr % (reas, addr, reas, date),
+            'data': datastr % (reas, addr, "公交", date),
             'msgUrl': '''syt/zzapply/list.htm?type=YQSJCJ&xmid=4a4ce9d674438da101745ca20e2b3a5e''',
-            'uploadFileStr': '''{"c16":[]}''',
+            'uploadFileStr': str(self.userconfig['upfile']),
             'multiSelectData': '''{}'''}
         while True:
             try:
@@ -229,9 +221,8 @@ class PCPost:
             else:
                 break
 
-    def send_to_wechat(self):
-        # ★Modification needed
-        api = "https://sc.ftqq.com/[].send"  # Apply an wechat-chan api on ftqq.com and fill the expression
+    def send_to_phone(self):
+        api = self.userconfig["push_api"]
         data = {
             "text": self.subj,
             "desp": self.content}
@@ -251,18 +242,18 @@ class PCPost:
                                          headers=self.headers, cookies=self.cookies, data=data, verify=False)
                 status = re.findall(re.compile(r'\"data\":\"(.*?)\"'), r.text)[0]
                 if status == 'xz':
-                    self.subj = '✔已通过'
+                    self.subj = '√Approved'
                     self.content = """
-                    【😃早上好，Francis！】
-                    ◉出校请注意安全~(￣▽￣)~*
-                    ◉抓紧写论文✍⌨
-                    ◉做事不要拖✈💪
+                    【😃Morning！】
+                    ◉Protect yourself when going outside.~(￣▽￣)~*
+                    ◉Actions speak louder than words.✍⌨
+                    ◉Do not go gentle into that good night.💪
                     """
                 elif status == 'wh':
-                    self.subj = '⏰等待中...'
+                    self.subj = '⏰Waiting...'
                     self.content = """
-                    【⏰每2分钟查询，请等待...】
-                    ◉当前状态：%s
+                    【⏰Waiting for another 2 minutes...】
+                    ◉Status：%s
                     """ % r.text
                 else:
                     self.subj = '☛出现异常，请查看日志！'
@@ -283,7 +274,7 @@ if __name__ == '__main__':
     student.login()
     #iMessage.send_Message(News=student.message1 + "\n" + "Out-Apply: " + student.message3,
     #                      sub="Application: " + student.message2)
-    student.send_to_wechat()
+    student.send_to_phone()
     # time.sleep(120)  # wait for 2 minutes to check status
     # status = student.check_status()
     # while status != 'xz':  # once status doesn't match with "xz", into while loop
@@ -295,5 +286,5 @@ if __name__ == '__main__':
         time.sleep(120)  # wait for 2 minutes
         status = student.check_status()
         if status == 'xz':  # if the status match with the string 'xz', send the status and break the while loop
-            student.send_to_wechat()
+            student.send_to_phone()
             break

@@ -1,0 +1,41 @@
+{
+        "username":"Your StuID",
+        "password":"Your Portal Password",
+        "upfile":
+        {
+                "c5":
+                [
+                        {
+                                "name":"mmexport1627971156233.jpg",
+                                "data":"data:image/jpeg;base64,xxx(base64 code),
+                                "type":"image/jpeg"
+                        }
+                ],
+                "c1":
+                [
+                        {
+                                "name":"mmexport1627971160631.jpg",
+                                "data":"data:image/jpeg;base64,yyy(base64 code),
+                                "type":"image/jpeg"
+                        }
+                ]
+        },
+        "reas_addr":
+        {
+                "查资料需要": "国家图书馆",
+                "科研数据需要": "中科院地理所",
+                "工作面试": "朝阳区亮马桥路28号",
+                "牙医预约": "花园北路49号北医",
+                "买日用品": "超市发",
+                "买水果": "五道口购物中心",
+                "出去吃饭": "中关村北大街127号",
+                "健身锻炼": "中关村东路16号",
+                "买衣服": "三里屯路19号",
+                "购买东西": "五道口购物中心",
+                "雅思培训": "中关村大街19号",
+                "户外锻炼": "科荟路33号",
+                "户外运动": "科荟路33号",
+                "修发理发": "学清路甲8号"
+        },
+        "push_api": "https://sctapi.ftqq.com/[api].send"
+}
